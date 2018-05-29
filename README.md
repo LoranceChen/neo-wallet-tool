@@ -1,7 +1,7 @@
 # NeoWalletTool
 
 ## Features
-- 支持基于address的可用utxo查询
+- 查找钱包地址可用的utxo
   - eg: `http://localhost:8083/utxos/ARFe4mTKRTETerRoMsyzBXoPt2EKBvBXFX`
 
 ## Dependency
