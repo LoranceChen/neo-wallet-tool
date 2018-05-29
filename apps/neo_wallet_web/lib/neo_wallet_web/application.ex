@@ -4,17 +4,22 @@ defmodule NeoWalletWeb.Application do
   @moduledoc false
 
   use Application
-
+  
   def start(_type, _args) do
+    import Supervisor.Spec
     port = Application.get_env(:neo_wallet_web, :cowboy_port, 8080)
     
     # List all child processes to be supervised
     children = [
       # Starts a worker by calling: NeoWalletWeb.Worker.start_link(arg)
       # {NeoWalletWeb.Worker, arg},
-      Plug.Adapters.Cowboy2.child_spec(scheme: :http, plug: NeoWalletWeb.Router, options: [port: port]),
-      NeoWalletWeb.Repo,
-      NeoWalletWeb.Service.UtxoScheduler,
+     
+     NeoWalletWeb.Service.UtxoScheduler,
+      
+    #   Plug.Adapters.Cowboy.child_spec(scheme: :http, plug: NeoWalletWeb.Router, options: [port: port]),
+
+       NeoWalletWeb.Repo,
+     
     ]
 
     IO.puts "server listening at: #{port}"

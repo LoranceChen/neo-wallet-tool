@@ -1,14 +1,5 @@
 # This file is responsible for configuring your application
 # and its dependencies with the aid of the Mix.Config module.
-use Mix.Config
-
-config :neo_wallet_web, NeoWalletTool.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  database: "neo_wallet_web_repo",
-  username: "user",
-  password: "pass",
-  hostname: "localhost"
-
 
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
@@ -45,8 +36,8 @@ config :neo_wallet_web, NeoWalletWeb.Repo,
 #  password: "pass",
   hostname: "localhost"
 
-
 config :neo_wallet_web, cowboy_port: 8083
+
 config :neo_wallet_web, ecto_repos: [NeoWalletWeb.Repo]
 
 config :neo_wallet_web, neo_server: "http://40.125.171.0:20332"

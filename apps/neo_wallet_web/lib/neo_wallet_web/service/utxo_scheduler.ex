@@ -4,7 +4,7 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
   import Ecto.Query, only: [from: 2]
   
   @breakMilliTime 1000 * 5 * 1 # 5min
-  @switch false
+  @switch true
   @neo_server Application.get_env(:neo_wallet_web, :neo_server, "http://localhost:20332")
   
   def start_link(_opts) do
@@ -17,7 +17,10 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
   end
 
   def handle_info(:work, state) do
-    if @switch, do: work()
+    if @switch do
+      IO.puts "do utxo scheduler at - #{inspect(:calendar.local_time())}"
+      work()
+    end
     
     do_scheduler() # Reschedule once more
     {:noreply, state}
@@ -28,15 +31,15 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
   end
 
   defp work() do
-    IO.puts "#{__MODULE__}.work begin do scheduler at - #{inspect(:calendar.local_time())}"
+    #IO.puts "#{__MODULE__}.work begin do scheduler at - #{inspect(:calendar.local_time())}"
     currentBlockCount = get_current_block_counter_from_db()
     latestBlockCount = get_block_count_from_http()
-    IO.puts "#{__MODULE__}.work get context - #{currentBlockCount}, #{latestBlockCount}"
+    #IO.puts "#{__MODULE__}.work get context - #{currentBlockCount}, #{latestBlockCount}"
     blocks_update_loop(currentBlockCount + 1, latestBlockCount)
     
     #httpInfo = get_blockchain_from_http()
     #currentBlock = Repo. (NeoWalletWeb.Dao.BlockCounter, )
-    IO.puts "#{__MODULE__}.work end do scheduler at - #{inspect(:calendar.local_time())}"
+    #IO.puts "#{__MODULE__}.work end do scheduler at - #{inspect(:calendar.local_time())}"
     
   end
 
@@ -59,7 +62,7 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
 	  "id": 1
 	    }), [{"Content-Type", "application/json"}])
 
-    IO.puts "#{__MODULE__}.get_blockchain_from_http http response - #{inspect(blockId)}"#, #{inspect(neoResponse)}"
+    #IO.puts "#{__MODULE__}.get_blockchain_from_http http response - #{inspect(blockId)}"#, #{inspect(neoResponse)}"
     
     #  case neoResponse.status_code do
     #    200 -> # success
@@ -89,7 +92,7 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
       tx: txMap,
     }
 
-    IO.puts "#{__MODULE__}.get_blockchain_from_http formatted - #{inspect(blockId)}"#, #{inspect(formatted)}"
+    #IO.puts "#{__MODULE__}.get_blockchain_from_http formatted - #{inspect(blockId)}"#, #{inspect(formatted)}"
     
     formatted
     
@@ -127,7 +130,7 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
 	  where: u.txid == ^txid and u.n == ^vout
 	) |> NeoWalletWeb.Repo.delete_all(log: false) # delete one
 
-	IO.puts "#{__MODULE__}.block_update_work deleteUTXO - #{inspect(deleteRst)}"
+	#	IO.puts "#{__MODULE__}.block_update_work deleteUTXO - #{inspect(deleteRst)}"
       end)
 
       
@@ -154,8 +157,8 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
 	case NeoWalletWeb.Repo.get_by(NeoWalletWeb.Dao.UTXO, [address: address, asset: asset, txid: txid], log: false) do
 	  nil ->
 	    NeoWalletWeb.Repo.insert(utxoEntity, log: false)
-	    IO.puts "#{__MODULE__}.block_update_work insertUTXO - #{inspect(utxoEntity)}"
-	  _other ->
+	    # IO.puts "#{__MODULE__}.block_update_work insertUTXO - #{inspect(utxoEntity)}"
+	    _other ->
 	    nil
 	end
 	
@@ -163,8 +166,28 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
       
     end)
 
-    NeoWalletWeb.Repo.delete_all(NeoWalletWeb.Dao.BlockCounter, log: false)
-    NeoWalletWeb.Repo.insert(%NeoWalletWeb.Dao.BlockCounter{current_count: blockCount}, log: false)
+    #NeoWalletWeb.Repo.delete_all(NeoWalletWeb.Dao.BlockCounter, log: false)
+
+    
+    NeoWalletWeb.Repo.update_all(
+      NeoWalletWeb.Dao.BlockCounter,
+      [inc: [current_count: 1]],
+      log: false
+    )
+
+    # todo: this not work at runtime
+    # NeoWalletWeb.Repo.update_all(
+    #    NeoWalletWeb.Dao.BlockCounter,
+      #    inc: [current_count: 1],
+      #    log: false
+    # )
+
+    # todo: this not works at compile time
+    # from(u in NeoWalletWeb.Dao.BlockCounter, inc: [current_count: 1])
+    # |> NeoWalletWeb.Repo.update_all(log: false)
+    
+    
+    # NeoWalletWeb.Repo.insert(%NeoWalletWeb.Dao.BlockCounter{current_count: blockCount}, log: false)
     
   end
 

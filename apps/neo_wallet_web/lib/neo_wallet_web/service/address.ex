@@ -13,6 +13,8 @@ defmodule NeoWalletWeb.Service.Address do
       clearMap = rstMap |> Map.delete :__meta__
       clearMap = clearMap |> Map.delete :updated_at
       clearMap = clearMap |> Map.delete :inserted_at
+
+      clearMap
     end)
   end
 
