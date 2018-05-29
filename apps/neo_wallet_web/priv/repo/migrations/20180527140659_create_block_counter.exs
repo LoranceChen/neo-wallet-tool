@@ -7,6 +7,8 @@ defmodule NeoWalletWeb.Repo.Migrations.CreateBlockCounter do
 
       timestamps()
     end
-    
+
+  
   end
+
 end
