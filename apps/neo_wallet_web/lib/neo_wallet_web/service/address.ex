@@ -8,13 +8,11 @@ defmodule NeoWalletWeb.Service.Address do
     ) |> NeoWalletWeb.Repo.all(log: false)
 
     Enum.map(dbLst, fn(utxo) ->
-      rstMap = Map.from_struct utxo
-      
-      clearMap = rstMap |> Map.delete :__meta__
-      clearMap = clearMap |> Map.delete :updated_at
-      clearMap = clearMap |> Map.delete :inserted_at
+      Map.from_struct(utxo)
+      |> Map.delete(:__meta__)
+      |> Map.delete(:updated_at)
+      |> Map.delete(:inserted_at)
 
-      clearMap
     end)
   end
 
