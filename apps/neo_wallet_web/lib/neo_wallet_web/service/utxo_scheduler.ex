@@ -126,7 +126,7 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
 	vout = vin[:vout]
 	# remove a item when txid and vout is match
 	# ,
-	deleteRst = from(u in NeoWalletWeb.Dao.UTXO,
+	from(u in NeoWalletWeb.Dao.UTXO,
 	  where: u.txid == ^txid and u.n == ^vout
 	) |> NeoWalletWeb.Repo.delete_all(log: false) # delete one
 
