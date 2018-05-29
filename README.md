@@ -13,8 +13,11 @@
 - init project
   - `mix deps.get`
 - init mysql
-  - config mysql connection file `apps/neo_wallet_web/config/config.exs`
-  - `mix ecto.create`
-  - `mix ecto.migrate`
-- `iex -S mix`
+  - edit config file: `apps/neo_wallet_web/config/config.exs`
+	- mysql connection
+	- `cowboy_port`: the app listening port
+	- `neo_server`: neo http rpc server address 
+  - create database: `mix ecto.create`
+  - init database: `mix ecto.migrate`
+- run server: `iex -S mix`
 
