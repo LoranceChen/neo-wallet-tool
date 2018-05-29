@@ -1,8 +1,8 @@
 # NeoWalletTool
 
 ## Features
-- 查找钱包地址可用的utxo
-  - eg: `http://localhost:8083/utxos/ARFe4mTKRTETerRoMsyzBXoPt2EKBvBXFX`
+- 查找钱包地址的所有utxo
+  - API: `http://localhost:8083/utxos/{Address}`
 
 ## Dependency
 - [plug](https://github.com/elixir-plug/plug)
