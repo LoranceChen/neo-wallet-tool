@@ -11,9 +11,10 @@
 ## Install & Run
 - [install elixir](https://elixir-lang.org/install.html)
 - init project
-  - mix deps.get
+  - `mix deps.get`
 - init mysql
   - config mysql connection file `apps/neo_wallet_web/config/config.exs`
-  - `mix migrate`
+  - `mix ecto.create`
+  - `mix ecto.migrate`
 - `iex -S mix`
 
