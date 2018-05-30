@@ -17,6 +17,22 @@ defmodule NeoWalletWeb.Router do
   plug(:dispatch)
 
   get "/utxos/:address" do
+    response = get_utxos_response(address)
+    
+    send_resp(conn, 200, Poison.encode!(response))
+  end
+
+  get "/utxos" do
+    address = fetch_query_params(conn).params["address"]
+    response = get_utxos_response(address)
+    # IO.puts address
+    send_resp(conn, 200, Poison.encode!(response))
+  end
+
+  
+  match(_, do: send_resp(conn, 404, "Oops!\n"))
+
+  defp get_utxos_response(address) do
     dataLst = NeoWalletWeb.Service.Address.get_utxo(address)
     formatted = Enum.map(dataLst, fn(data) ->
       %{
@@ -36,11 +52,7 @@ defmodule NeoWalletWeb.Router do
     end)
 
     
-    response = %{state: 200, result: formatted}
-    
-    send_resp(conn, 200, Poison.encode!(response))
+    %{state: 200, result: formatted}
   end
-  
-  match(_, do: send_resp(conn, 404, "Oops!\n"))
   
 end
