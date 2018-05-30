@@ -44,10 +44,10 @@ defmodule NeoWalletWeb.Router do
 	  Value: data[:value],
 	  N: data[:n],
 	},
-	spentBlock: data[:block],
-	spentTime: data[:spentTime],
-	createTime: data[:spentTime],
-	gas: data[:gas],	  
+	spentBlock: -1, # data[:block],
+	spentTime: "", # data[:spentTime],
+	createTime: Integer.to_string(data[:spentTime]),
+	gas: data[:gas],
   }
     end)
 
