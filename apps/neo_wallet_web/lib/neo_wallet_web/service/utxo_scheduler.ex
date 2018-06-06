@@ -107,7 +107,8 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
 	    "id": 1
 	  }
 	),
-      [{"Content-Type", "application/json"}]
+      [{"Content-Type", "application/json"}],
+      [recv_timeout: 30_000]
     )
 
     body = Poison.decode!(httpResponse.body)
