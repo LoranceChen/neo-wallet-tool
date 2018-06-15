@@ -1,7 +1,7 @@
 defmodule NeoWalletWeb.Service.Address do
 
   import Ecto.Query, only: [from: 2]
-  
+
   def get_utxo(address) do
     dbLst = from(u in NeoWalletWeb.Dao.UTXO,
       where: u.address == ^address
@@ -17,10 +17,10 @@ defmodule NeoWalletWeb.Service.Address do
   end
 
   def test_get_person(id) do
-    
-    
+
+
     NeoWalletWeb.Repo.all(NeoWalletWeb.Dao.Person, [id: id])
   end
-  
+
 end
 
