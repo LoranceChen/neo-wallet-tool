@@ -39,7 +39,6 @@ defmodule NeoWalletWeb.MixProject do
       {:poison, "~> 3.1.0"},
       {:httpoison, "~> 1.1"},
       {:cowboy, "~> 2.4.0", override: true},
-      {:base58, git: "https://github.com/dougal/base58.ex.git"}
 
 	# {:dep_from_hexpm, "~> 0.3.0"},
 	# {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
