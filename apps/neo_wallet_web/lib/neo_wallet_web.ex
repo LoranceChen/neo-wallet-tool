@@ -15,4 +15,11 @@ defmodule NeoWalletWeb do
   def hello do
     :world
   end
+
+  @spec hekko(atom) :: atom
+  def hekko(at) do
+    :error
+  end
+
+  
 end
