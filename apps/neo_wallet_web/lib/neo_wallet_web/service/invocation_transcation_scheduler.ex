@@ -156,7 +156,7 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
           # IO.puts "#{__MODULE__}.block_update_work get utxoEntity - #{inspect(utxoEntity)}"
           case NeoWalletWeb.Repo.get_by(
                 NeoWalletWeb.Dao.TranscationHistory,
-                [n: n, txid: txid],
+                [txid: txid, n: n],
                 log: false
               ) do
             nil ->
