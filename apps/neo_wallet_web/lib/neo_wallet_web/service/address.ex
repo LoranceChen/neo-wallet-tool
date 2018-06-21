@@ -20,7 +20,7 @@ defmodule NeoWalletWeb.Service.Address do
     dbLst = from(th in NeoWalletWeb.Dao.TranscationHistory,
       where: th.create_timestamp >= ^beginTime and th.create_timestamp <= ^endTime and (th.from == ^address or th.to == ^address),
       order_by: [asc: th.create_timestamp],
-      limit: 100
+      limit: 1000
     ) |> NeoWalletWeb.Repo.all(log: false)
 
     Enum.map(dbLst, fn(th) ->
