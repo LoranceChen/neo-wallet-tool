@@ -17,6 +17,10 @@ defmodule NeoWalletWeb.Service.Address do
   end
 
   def get_transaction_history(address, beginTime, endTime) do
+    IO.puts(address)
+    IO.puts(beginTime)
+    IO.puts(endTime)
+
     dbLst = from(th in NeoWalletWeb.Dao.TranscationHistory,
       where: th.create_timestamp >= ^beginTime and th.create_timestamp <= ^endTime and (th.from == ^address or th.to == ^address)
     ) |> NeoWalletWeb.Repo.all(log: false)

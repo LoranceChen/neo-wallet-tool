@@ -33,10 +33,11 @@ defmodule NeoWalletWeb.Router do
     beginTime = fetch_query_params(conn).params["beginTime"]
     endTime = fetch_query_params(conn).params["endTime"]
 
+
     response = if is_nil(endTime) do
-      get_transaction_history_response(address, beginTime)
+      get_transaction_history_response(address, String.to_integer(beginTime))
     else
-      get_transaction_history_response(address, beginTime, endTime)
+      get_transaction_history_response(address, String.to_integer(beginTime), endTime)
     end
 
     send_resp(conn, 200, Poison.encode!(response))
@@ -82,14 +83,18 @@ defmodule NeoWalletWeb.Router do
   end
 
   def get_transaction_history_response(address, beginTime, endTime \\ DateTime.to_unix(DateTime.utc_now)) do
+    IO.puts("address - #{inspect(address)}")
+    IO.puts("beginTime - #{inspect(beginTime)}")
+    IO.puts("endTime - #{inspect(endTime)}")
+
     dataLst = NeoWalletWeb.Service.Address.get_transaction_history(address, beginTime, endTime)
 
     formatted = Enum.map(dataLst, fn(data) ->
       rawValue = data[:value]
-      valueStr = if rawValue > 0 do
-        "+" <> Integer.to_string(rawValue)
+      valueStr = if String.to_integer(rawValue) > 0 do
+        "+" <> rawValue
       else
-        "-" <> Integer.to_string(rawValue)
+        "-" <> rawValue
       end
       %{
         txid: data[:txid],

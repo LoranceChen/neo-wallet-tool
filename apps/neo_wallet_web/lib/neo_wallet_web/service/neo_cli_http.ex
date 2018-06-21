@@ -20,11 +20,12 @@ defmodule NeoWalletWeb.Service.NeoCliHttp do
   #     }
   # }
 
+  # todo add cache
     neoResponse = HTTPoison.post!(@neo_server, ~s({
       "jsonrpc": "2.0",
       "method": "invokefunction",
       "params": [
-        "#{nep5_hash}",
+        "0x#{nep5_hash}",
         "decimals",
         []
         ],
