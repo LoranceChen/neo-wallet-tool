@@ -156,7 +156,7 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
           # IO.puts "#{__MODULE__}.block_update_work get utxoEntity - #{inspect(utxoEntity)}"
           case NeoWalletWeb.Repo.get_by(
                 NeoWalletWeb.Dao.TranscationHistory,
-                [txid: txid, n: n],
+                [txid: txid, n: n, type: "NEO"],
                 log: false
               ) do
             nil ->
@@ -201,10 +201,10 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
     # end
     Enum.each(it_load, fn it_item ->
       txid = it_item[:txid]
-
+      n = it_item[:n]
       data = %NeoWalletWeb.Dao.TranscationHistory{
         txid: txid,
-        n: it_item[:n], # represent NEP5
+        n: n, # represent NEP5
         type: "NEP5",
         asset_id: it_item[:contract],
         create_timestamp: time,
@@ -219,7 +219,7 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
       # check not inserted the NEP5 txid
       case NeoWalletWeb.Repo.get_by(
               NeoWalletWeb.Dao.TranscationHistory,
-              [txid: txid, type: "NEP5"], # type needn't set as index.
+              [txid: txid, n: n, type: "NEP5"],
               log: false
             ) do
         nil ->
