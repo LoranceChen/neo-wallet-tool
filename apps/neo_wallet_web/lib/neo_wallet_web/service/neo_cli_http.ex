@@ -1,7 +1,5 @@
 defmodule NeoWalletWeb.Service.NeoCliHttp do
   use GenServer
-  alias NeoWalletWeb.Repo
-  import Ecto.Query, only: [from: 2]
 
   @neo_server Application.get_env(:neo_wallet_web, :neo_server, "http://localhost:20332")
 
