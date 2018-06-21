@@ -4,6 +4,7 @@ defmodule NeoWalletWeb.Dao.BlockCounter do
   @primary_key false
   schema "block_counter" do
     field :current_count, :integer
+    field :type, :string
 
     timestamps()
   end

@@ -4,7 +4,7 @@ defmodule NeoWalletWeb.Service.Address do
 
   def get_utxo(address) do
     dbLst = from(u in NeoWalletWeb.Dao.UTXO,
-      where: u.address == ^address
+      where: u.address == ^address and u.is_spent == false
     ) |> NeoWalletWeb.Repo.all(log: false)
 
     Enum.map(dbLst, fn(utxo) ->
@@ -16,11 +16,18 @@ defmodule NeoWalletWeb.Service.Address do
     end)
   end
 
-  def test_get_person(id) do
+  def get_transaction_history(address, beginTime, endTime) do
+    dbLst = from(th in NeoWalletWeb.Dao.TranscationHistory,
+      where: th.create_timestamp >= ^beginTime and th.create_timestamp <= ^endTime and (th.from == ^address or th.to == ^address)
+    ) |> NeoWalletWeb.Repo.all(log: false)
 
+    Enum.map(dbLst, fn(th) ->
+      Map.from_struct(th)
+      |> Map.delete(:__meta__)
+      |> Map.delete(:updated_at)
+      |> Map.delete(:inserted_at)
 
-    NeoWalletWeb.Repo.all(NeoWalletWeb.Dao.Person, [id: id])
+    end)
   end
 
 end
-

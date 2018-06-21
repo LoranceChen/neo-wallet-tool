@@ -12,6 +12,8 @@ defmodule NeoWalletWeb.Dao.UTXO do
     field :createTime, :integer
     field :gas, :string
     field :block, :integer
+    field :is_spent, :boolean
+
     timestamps()
   end
 end

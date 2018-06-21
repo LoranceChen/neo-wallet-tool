@@ -6,7 +6,7 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
   # milli seconds
   @breakMilliTime 1000 * 5 * 1
   @switch true
-  @neo_server Application.get_env(:neo_wallet_web, :neo_server, "http://localhost:20332")
+  @neo_server Application.get_env(:neo_wallet_web, :neo_server, "https://tracker.chinapex.com.cn/neo-cli/")
 
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, %{})
@@ -20,7 +20,7 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
 
   def handle_info(:work, state) do
     if @switch do
-      IO.puts("do utxo scheduler at - #{inspect(:calendar.local_time())}")
+      IO.puts("#{__MODULE__} do utxo scheduler at - #{inspect(:calendar.local_time())}")
       work()
     end
 
@@ -49,6 +49,7 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
     query =
       from(
         b in "block_counter",
+        where: is_nil(b.type),
         select: b.current_count
       )
 
@@ -108,13 +109,13 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
 
   def get_block_count_from_http() do
     httpResponse = HTTPoison.post!(@neo_server, ~s(
-	  {
-	    "jsonrpc": "2.0",
-	    "method": "getblockcount",
-	    "params": [],
-	    "id": 1
-	  }
-	), [{"Content-Type", "application/json"}], recv_timeout: 30_000)
+	    {
+        "jsonrpc": "2.0",
+        "method": "getblockcount",
+        "params": [],
+        "id": 1
+      }
+    ), [{"Content-Type", "application/json"}], recv_timeout: 30_000)
 
     body = Poison.decode!(httpResponse.body)
     body["result"]
@@ -132,12 +133,12 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
         vout = vin[:vout]
         # remove a item when txid and vout is match
         # ,
-        from(
+        q = from(
           u in NeoWalletWeb.Dao.UTXO,
           where: u.txid == ^txid and u.n == ^vout
         )
-        # delete one
-        |> NeoWalletWeb.Repo.delete_all(log: false)
+        # flag is used
+        NeoWalletWeb.Repo.update_all(q, [set: [is_spent: true]], log: false)
 
         # 	IO.puts "#{__MODULE__}.block_update_work deleteUTXO - #{inspect(deleteRst)}"
       end)
@@ -157,7 +158,8 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
           spentTime: time,
           createTime: time,
           gas: "",
-          block: blockCount
+          block: blockCount,
+          is_spent: false,
         }
 
         # IO.puts "#{__MODULE__}.block_update_work get utxoEntity - #{inspect(utxoEntity)}"
@@ -177,13 +179,11 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
       end)
     end)
 
-    # NeoWalletWeb.Repo.delete_all(NeoWalletWeb.Dao.BlockCounter, log: false)
-
-    NeoWalletWeb.Repo.update_all(
-      NeoWalletWeb.Dao.BlockCounter,
-      [inc: [current_count: 1]],
-      log: false
-    )
+    # NeoWalletWeb.Repo.update_all(
+    #   NeoWalletWeb.Dao.BlockCounter,
+    #   [inc: [current_count: 1]],
+    #   log: false
+    # )
 
     # todo: this not work at runtime
     # NeoWalletWeb.Repo.update_all(
@@ -204,6 +204,17 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
       blockInfoMap = get_blockchain_from_http(beginBlock)
       block_update_work(blockInfoMap, beginBlock)
 
+      # NeoWalletWeb.Repo.delete_all(NeoWalletWeb.Dao.BlockCounter, log: false)
+      q = from(
+        b in NeoWalletWeb.Dao.BlockCounter,
+        where: is_nil(b.type)
+      )
+
+      NeoWalletWeb.Repo.update_all(
+        q,
+        [inc: [current_count: 1]],
+        log: false
+      )
       # :timer.sleep(1000 * 2)
       # IO.puts "\n=================\n\n\n==================\n"
       blocks_update_loop(beginBlock + 1, toBlock)

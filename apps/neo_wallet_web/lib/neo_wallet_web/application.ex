@@ -12,12 +12,10 @@ defmodule NeoWalletWeb.Application do
     children = [
       # Starts a worker by calling: NeoWalletWeb.Worker.start_link(arg)
       # {NeoWalletWeb.Worker, arg},
-
-      NeoWalletWeb.Service.UtxoScheduler,
-   #   NeoWalletWeb.Service.TrascationScheduler,
-      Plug.Adapters.Cowboy2.child_spec(scheme: :http, plug: NeoWalletWeb.Router, options: [port: port]),
-
       NeoWalletWeb.Repo,
+      NeoWalletWeb.Service.UtxoScheduler,
+      NeoWalletWeb.Service.InvocationTranscationScheduler,
+      Plug.Adapters.Cowboy2.child_spec(scheme: :http, plug: NeoWalletWeb.Router, options: [port: port]),
 
     ]
 

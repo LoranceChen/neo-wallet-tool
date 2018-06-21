@@ -40,6 +40,6 @@ config :neo_wallet_web, cowboy_port: 8083
 
 config :neo_wallet_web, ecto_repos: [NeoWalletWeb.Repo]
 
-config :neo_wallet_web, neo_server: "http://40.125.171.0:20332"
+config :neo_wallet_web, neo_server: "https://tracker.chinapex.com.cn/neo-cli/"
 
 config :neo_wallet_web, neo_address_version: 23
