@@ -1,40 +1,48 @@
 defmodule NeoWalletWeb.Service.NeoCliHttp do
+  use GenServer
+  alias NeoWalletWeb.Repo
+  import Ecto.Query, only: [from: 2]
 
   @neo_server Application.get_env(:neo_wallet_web, :neo_server, "http://localhost:20332")
 
+  def start_link(_opt) do
+    GenServer.start_link(__MODULE__, :ok)
+  end
+
+  def init(:ok) do
+    ref = :ets.new(:nep5_hash, [
+      :named_table,
+      :set,
+      :public,
+      read_concurrency: true,
+      write_concurrency: true
+    ])
+    {:ok, ref}
+  end
+
   def get_decimal(nep5_hash) do
-  # HTTP response:
-  # {
-  #     "jsonrpc": "2.0",
-  #     "id": 2,
-  #     "result": {
-  #         "script": "00c108646563696d616c7367f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ec",
-  #         "state": "HALT, BREAK",
-  #         "gas_consumed": "0.156",
-  #         "stack": [
-  #             {
-  #                 "type": "Integer",
-  #                 "value": "8"
-  #             }
-  #         ]
-  #     }
-  # }
+    case :ets.lookup(:nep5_hash, nep5_hash) do
+      [] ->
+        neoResponse = HTTPoison.post!(@neo_server, ~s({
+          "jsonrpc": "2.0",
+          "method": "invokefunction",
+          "params": [
+            "0x#{nep5_hash}",
+            "decimals",
+            []
+            ],
+          "id": 2
+        }), [{"Content-Type", "application/json"}])
 
-  # todo add cache
-    neoResponse = HTTPoison.post!(@neo_server, ~s({
-      "jsonrpc": "2.0",
-      "method": "invokefunction",
-      "params": [
-        "0x#{nep5_hash}",
-        "decimals",
-        []
-        ],
-      "id": 2
-    }), [{"Content-Type", "application/json"}])
+        bodyStr = neoResponse.body
+        bodyMap = Poison.decode!(bodyStr)
+        result = bodyMap["result"]
+        dicemal = result["stack"][0]["value"]
+        :ets.insert(:nep5_hash, {nep5_hash, dicemal})
+        dicemal
+      [{_, dicemal}] ->
+        dicemal
+    end
 
-    bodyStr = neoResponse.body
-    bodyMap = Poison.decode!(bodyStr)
-    result = bodyMap["result"]
-    result["stack"][0]["value"]
   end
 end

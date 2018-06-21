@@ -15,6 +15,8 @@ defmodule NeoWalletWeb.Application do
       NeoWalletWeb.Repo,
       NeoWalletWeb.Service.UtxoScheduler,
       NeoWalletWeb.Service.InvocationTranscationScheduler,
+      NeoWalletWeb.Service.NeoCliHttp,
+
       Plug.Adapters.Cowboy2.child_spec(scheme: :http, plug: NeoWalletWeb.Router, options: [port: port]),
 
     ]

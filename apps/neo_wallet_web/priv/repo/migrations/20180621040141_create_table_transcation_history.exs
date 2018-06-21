@@ -21,6 +21,7 @@ defmodule NeoWalletWeb.Repo.Migrations.CreateTableTranscationHistory do
     create index(:transcation_history, [:from])
     create index(:transcation_history, [:to])
     create index(:transcation_history, [:create_timestamp])
+
     # txid and n should be primary key
     create index(:transcation_history, [:txid])
     create index(:transcation_history, [:n])
