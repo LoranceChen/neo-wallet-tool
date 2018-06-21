@@ -25,7 +25,6 @@ defmodule NeoWalletWeb.Router do
   get "/utxos" do
     address = fetch_query_params(conn).params["address"]
     response = get_utxos_response(address)
-    # IO.puts address
     send_resp(conn, 200, Poison.encode!(response))
   end
 
@@ -83,10 +82,6 @@ defmodule NeoWalletWeb.Router do
   end
 
   def get_transaction_history_response(address, beginTime, endTime \\ DateTime.to_unix(DateTime.utc_now)) do
-    IO.puts("address - #{inspect(address)}")
-    IO.puts("beginTime - #{inspect(beginTime)}")
-    IO.puts("endTime - #{inspect(endTime)}")
-
     dataLst = NeoWalletWeb.Service.Address.get_transaction_history(address, beginTime, endTime)
 
     formatted = Enum.map(dataLst, fn(data) ->
