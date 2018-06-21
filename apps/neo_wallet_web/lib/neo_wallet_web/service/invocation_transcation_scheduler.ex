@@ -214,7 +214,6 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
         block: blockCount
       }
 
-      IO.puts("aaaaaaa")
       # check not inserted the NEP5 txid
       case NeoWalletWeb.Repo.get_by(
               NeoWalletWeb.Dao.TranscationHistory,
@@ -222,7 +221,6 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
               log: false
             ) do
         nil ->
-          IO.puts("bbbbbb")
           Repo.insert(data, log: false)
 
         # IO.puts "#{__MODULE__}.block_update_work insertUTXO - #{inspect(utxoEntity)}"
