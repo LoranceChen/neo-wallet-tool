@@ -3,6 +3,8 @@
 ## Features
 - 查找钱包地址的所有utxo
   - API: `http://localhost:8083/utxos/{Address}`
+- 查找钱包地址的所有交易记录
+  - API: `http://localhost:8083/transaction-history/{Address}?beginTime={timestamp}`
 
 ## Dependency
 - [plug](https://github.com/elixir-plug/plug)
