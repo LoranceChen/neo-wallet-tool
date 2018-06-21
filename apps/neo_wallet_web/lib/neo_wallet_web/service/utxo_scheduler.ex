@@ -39,10 +39,6 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
     latestBlockCount = get_block_count_from_http()
     # IO.puts "#{__MODULE__}.work get context - #{currentBlockCount}, #{latestBlockCount}"
     blocks_update_loop(currentBlockCount + 1, latestBlockCount)
-
-    # httpInfo = get_blockchain_from_http()
-    # currentBlock = Repo. (NeoWalletWeb.Dao.BlockCounter, )
-    # IO.puts "#{__MODULE__}.work end do scheduler at - #{inspect(:calendar.local_time())}"
   end
 
   def get_current_block_counter_from_db() do

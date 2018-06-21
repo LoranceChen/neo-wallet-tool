@@ -200,8 +200,10 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
     #   timestamps()
     # end
     Enum.each(it_load, fn it_item ->
+      txid = it_item[:txid]
+
       data = %NeoWalletWeb.Dao.TranscationHistory{
-        txid: it_item[:txid],
+        txid: txid,
         n: it_item[:n], # represent NEP5
         type: "NEP5",
         asset_id: it_item[:contract],
@@ -217,7 +219,7 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
       # check not inserted the NEP5 txid
       case NeoWalletWeb.Repo.get_by(
               NeoWalletWeb.Dao.TranscationHistory,
-              [txid: it_item[:txid]],
+              [txid: txid, type: "NEP5"], # type needn't set as index.
               log: false
             ) do
         nil ->
@@ -227,25 +229,8 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
         _other ->
           nil
       end
-
-
     end)
 
-
-    # NeoWalletWeb.Repo.delete_all(NeoWalletWeb.Dao.BlockCounter, log: false)
-
-    # todo: this not work at runtime
-    # NeoWalletWeb.Repo.update_all(
-    #    NeoWalletWeb.Dao.BlockCounter,
-    #    inc: [current_count: 1],
-    #    log: false
-    # )
-
-    # todo: this not works at compile time
-    # from(u in NeoWalletWeb.Dao.BlockCounter, inc: [current_count: 1])
-    # |> NeoWalletWeb.Repo.update_all(log: false)
-
-    # NeoWalletWeb.Repo.insert(%NeoWalletWeb.Dao.BlockCounter{current_count: blockCount}, log: false)
   end
 
   def blocks_update_loop(beginBlock, toBlock) do
@@ -268,9 +253,6 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
         log: false
       )
 
-
-      # :timer.sleep(1000 * 2)
-      # IO.puts "\n=================\n\n\n==================\n"
       blocks_update_loop(beginBlock + 1, toBlock)
     end
   end
@@ -291,6 +273,7 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
     dataRst = Enum.map(Stream.with_index(notifications, 0), fn {notification, index} ->
       contract = notification["contract"]
       state_value = notification["state"]["value"]
+
       # nep5 method should be "transfer"
       nep5Method = Enum.at(state_value, 0)
       nep5MethodStr = NeoWalletWeb.Util.hex_to_string(nep5Method)

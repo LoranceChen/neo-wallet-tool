@@ -86,7 +86,8 @@ defmodule NeoWalletWeb.Router do
 
     formatted = Enum.map(dataLst, fn(data) ->
       rawValue = data[:value]
-      valueStr = if String.to_integer(rawValue) > 0 do
+      fromAddr = data[:from]
+      valueStr = if fromAddr == address do
         "+" <> rawValue
       else
         "-" <> rawValue
@@ -96,7 +97,7 @@ defmodule NeoWalletWeb.Router do
         type: data[:type],
         assetId: data[:asset_id],
         time: data[:create_timestamp],
-        from: data[:from],
+        from: fromAddr,
         to: data[:to],
         value: valueStr,
         gas_consumed: data[:gas_consumed],
