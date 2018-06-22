@@ -82,45 +82,8 @@ defmodule NeoWalletWeb.Router do
   end
 
   def get_transaction_history_response(address, beginTime, endTime \\ DateTime.to_unix(DateTime.utc_now)) do
-    dataLst = NeoWalletWeb.Service.Address.get_transaction_history(address, beginTime, endTime)
+    data = NeoWalletWeb.Service.Address.get_transaction_history(address, beginTime, endTime)
 
-    formatted = Enum.map(dataLst, fn(data) ->
-      rawValue = data[:value]
-      fromAddr = data[:from]
-      valueStr = if fromAddr == address do
-        "+" <> rawValue
-      else
-        "-" <> rawValue
-      end
-
-      txid = data[:txid]
-      symbol = case data[:type] do
-        "NEO" ->
-          "NEO"
-        "NEP5" ->
-          [{_, %{symbol: theSymbol}}] = :ets.lookup(:neo_token, txid)
-          theSymbol
-        other ->
-          "unsupported-#{other}"
-      end
-
-      %{
-        txid: data[:txid],
-        type: data[:type],
-        assetId: data[:asset_id],
-        time: data[:create_timestamp],
-        from: fromAddr,
-        to: data[:to],
-        value: valueStr,
-        gas_consumed: data[:gas_consumed],
-        vmstate: data[:vmstate],
-        symbol: symbol,
-        imageURL: "todo_imageURL",
-        decimal: NeoWalletWeb.Service.NeoCliHttp.get_decimal(data[:asset_id]),
-      }
-    end)
-
-    %{state: 200, result: formatted}
-
+    %{state: 200, result: data}
   end
 end
