@@ -290,7 +290,7 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
 
           # nep5 method should be "transfer"
           nep5Method = Enum.at(state_value, 0)
-          nep5MethodStr = NeoWalletWeb.Util.hex_to_string(nep5Method)
+          nep5MethodStr = NeoWalletWeb.Util.hex_to_string(nep5Method["value"])
 
           loadRst =
             if nep5MethodStr == "transfer" do
