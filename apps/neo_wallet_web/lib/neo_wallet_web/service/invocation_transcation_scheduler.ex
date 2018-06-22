@@ -268,12 +268,13 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
     neoResponse = HTTPoison.post!(@neo_server, ~s({
       "jsonrpc": "2.0",
       "method": "getapplicationlog",
-      "params": [#{txid}],
+      "params": ["#{txid}"],
       "id": 1
         }), [{"Content-Type", "application/json"}])
 
     bodyStr = neoResponse.body
     bodyMap = Poison.decode!(bodyStr)
+
     result = bodyMap["result"]
     vmstate = result["vmstate"]
 
