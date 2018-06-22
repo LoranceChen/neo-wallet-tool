@@ -294,9 +294,9 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
 
           loadRst =
             if nep5MethodStr == "transfer" do
-              from = Enum.at(state_value, 1)
-              to = Enum.at(state_value, 2)
-              value = Enum.at(state_value, 3)
+              from = Enum.at(state_value, 1)["value"]
+              to = Enum.at(state_value, 2)["value"]
+              value = Enum.at(state_value, 3)["value"]
 
               fromDecoded = NeoWalletWeb.Util.hex_to_addr(from)
               toDecoded = NeoWalletWeb.Util.hex_to_addr(to)
