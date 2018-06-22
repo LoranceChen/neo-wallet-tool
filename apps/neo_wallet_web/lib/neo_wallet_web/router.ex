@@ -56,6 +56,12 @@ defmodule NeoWalletWeb.Router do
     send_resp(conn, 200, Poison.encode!(response))
   end
 
+  get "/assets" do
+    assets = NeoWalletWeb.Service.Address.get_assets()
+    result = %{state: 200, result: assets}
+    send_resp(conn, 200, Poison.encode!(result))
+  end
+
   match(_, do: send_resp(conn, 404, "Oops!\n"))
 
   defp get_utxos_response(address) do
@@ -76,7 +82,6 @@ defmodule NeoWalletWeb.Router do
         gas: data[:gas],
       }
     end)
-
 
     %{state: 200, result: formatted}
   end

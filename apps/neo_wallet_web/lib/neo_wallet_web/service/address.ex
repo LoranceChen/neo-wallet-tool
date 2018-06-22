@@ -88,7 +88,26 @@ defmodule NeoWalletWeb.Service.Address do
     formatted
   end
 
-  def init_token() do
+  # {
+  #   data: [
+  #     {
+  #       hash: //资产的hash
+  #       precision: //资产精度。server端从http rpc的invokefunction中获取
+  #       symbol: CPX
+  #       type: NEP5 //暂时只支持NEP5
+  #       imageURL: //logo
+
+  #     },
+  #     ...
+  #   ]
+  # }
+  def get_assets() do
+    :ets.foldl(fn ({key, value}, acc) ->
+      acc ++ [value]
+    end, [], :neo_token)
+  end
+
+  defp init_token() do
     # "HexHash,Type,Name,Symbol,Precision,Hash"
     lst = NeoWalletWeb.Util.read_file_lines("neo_token.csv")
     IO.puts("neo_tracker.csv template - #{List.first(lst)}")
