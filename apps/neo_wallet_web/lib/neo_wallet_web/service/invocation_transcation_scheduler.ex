@@ -275,7 +275,7 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
     bodyStr = neoResponse.body
     bodyMap = Poison.decode!(bodyStr)
     result = bodyMap["result"]
-    vmstate = bodyMap["vmstate"]
+    vmstate = result["vmstate"]
 
     if String.contains?(vmstate, "FAULT") do
       []
