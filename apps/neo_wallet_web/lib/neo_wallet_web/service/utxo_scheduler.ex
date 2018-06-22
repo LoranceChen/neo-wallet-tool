@@ -162,7 +162,7 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
 
         case NeoWalletWeb.Repo.get_by(
                NeoWalletWeb.Dao.UTXO,
-               [address: address, asset: asset, txid: txid],
+               [txid: txid, address: address, asset: asset],
                log: false
              ) do
           nil ->
