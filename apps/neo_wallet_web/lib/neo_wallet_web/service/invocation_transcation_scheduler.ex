@@ -6,7 +6,11 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
   # milli seconds
   @breakMilliTime 1000 * 8 * 1
   @switch true
-  @neo_server Application.get_env(:neo_wallet_web, :neo_server, "https://tracker.chinapex.com.cn/neo-cli/")
+  @neo_server Application.get_env(
+                :neo_wallet_web,
+                :neo_server,
+                "https://tracker.chinapex.com.cn/neo-cli/"
+              )
 
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, %{})
@@ -39,7 +43,6 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
 
     if curITBlock < curUtxoBlock do
       blocks_update_loop(curITBlock + 1, curUtxoBlock)
-
     end
 
     # httpInfo = get_blockchain_from_http()
@@ -53,7 +56,6 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
         b in "block_counter",
         where: is_nil(b.type) or b.type == "invocation_transcation",
         select: {b.current_count, b.type}
-
       )
 
     case Repo.all(utxoAndIT, log: false) do
@@ -84,7 +86,8 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
       Enum.map(tx, fn tx_item ->
         %{
           txid: tx_item["txid"],
-          type: tx_item["type"], # get InvocationTransaction
+          # get InvocationTransaction
+          type: tx_item["type"],
           vin:
             Enum.map(tx_item["vin"], fn vin ->
               %{txid: vin["txid"], vout: vin["vout"]}
@@ -122,11 +125,13 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
 
       # first vin address
       first_vin = List.first(tx_item[:vin])
+
       if first_vin != nil do
         first_vin_txid = first_vin[:txid]
         first_vin_vout = first_vin[:vout]
 
-        q = from(
+        q =
+          from(
             u in NeoWalletWeb.Dao.UTXO,
             where: u.txid == ^first_vin_txid and u.n == ^first_vin_vout,
             select: u.address
@@ -150,15 +155,15 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
             to: address,
             value: value,
             gas_consumed: gas,
-            block: blockCount,
+            block: blockCount
           }
 
           # IO.puts "#{__MODULE__}.block_update_work get utxoEntity - #{inspect(utxoEntity)}"
           case NeoWalletWeb.Repo.get_by(
-                NeoWalletWeb.Dao.TranscationHistory,
-                [txid: txid, n: n, type: "NEO"],
-                log: false
-              ) do
+                 NeoWalletWeb.Dao.TranscationHistory,
+                 [txid: txid, n: n, type: "NEO"],
+                 log: false
+               ) do
             nil ->
               NeoWalletWeb.Repo.insert(itEntity, log: false)
 
@@ -168,22 +173,23 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
           end
         end)
       end
-
     end)
-
   end
 
   def block_update_nep5_token(blockChainMap, blockCount) do
     time = blockChainMap[:time]
-    it_tx = Enum.filter(blockChainMap[:tx], fn tx_item ->
-      tx_item[:type] == "InvocationTransaction"
-    end)
 
-    it_load = Enum.flat_map(it_tx, fn tx_item ->
-      txid = tx_item[:txid]
+    it_tx =
+      Enum.filter(blockChainMap[:tx], fn tx_item ->
+        tx_item[:type] == "InvocationTransaction"
+      end)
 
-      get_invocation_tansaction_from_http(txid)
-    end)
+    it_load =
+      Enum.flat_map(it_tx, fn tx_item ->
+        txid = tx_item[:txid]
+
+        get_invocation_tansaction_from_http(txid)
+      end)
 
     # schema "transcation_history" do
     #   field :txid, :string
@@ -202,9 +208,11 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
     Enum.each(it_load, fn it_item ->
       txid = it_item[:txid]
       n = it_item[:n]
+
       data = %NeoWalletWeb.Dao.TranscationHistory{
         txid: txid,
-        n: n, # represent NEP5
+        # represent NEP5
+        n: n,
         type: "NEP5",
         asset_id: it_item[:contract],
         create_timestamp: time,
@@ -218,10 +226,10 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
 
       # check not inserted the NEP5 txid
       case NeoWalletWeb.Repo.get_by(
-              NeoWalletWeb.Dao.TranscationHistory,
-              [txid: txid, n: n, type: "NEP5"],
-              log: false
-            ) do
+             NeoWalletWeb.Dao.TranscationHistory,
+             [txid: txid, n: n, type: "NEP5"],
+             log: false
+           ) do
         nil ->
           Repo.insert(data, log: false)
 
@@ -230,7 +238,6 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
           nil
       end
     end)
-
   end
 
   def blocks_update_loop(beginBlock, toBlock) do
@@ -240,12 +247,12 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
 
       block_update_nep5_token(blockInfoMap, beginBlock)
 
-
       # update counter - compelete the block works
-      q = from(
-        b in NeoWalletWeb.Dao.BlockCounter,
-        where: b.type == "invocation_transcation"
-      )
+      q =
+        from(
+          b in NeoWalletWeb.Dao.BlockCounter,
+          where: b.type == "invocation_transcation"
+        )
 
       NeoWalletWeb.Repo.update_all(
         q,
@@ -256,7 +263,6 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
       blocks_update_loop(beginBlock + 1, toBlock)
     end
   end
-
 
   def get_invocation_tansaction_from_http(txid) do
     neoResponse = HTTPoison.post!(@neo_server, ~s({
@@ -269,56 +275,66 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
     bodyStr = neoResponse.body
     bodyMap = Poison.decode!(bodyStr)
     result = bodyMap["result"]
-    notifications = result["notifications"]
-    dataRst = Enum.map(Stream.with_index(notifications, 0), fn {notification, index} ->
-      contract = notification["contract"]
-      state_value = notification["state"]["value"]
+    vmstate = bodyMap["vmstate"]
 
-      # nep5 method should be "transfer"
-      nep5Method = Enum.at(state_value, 0)
-      nep5MethodStr = NeoWalletWeb.Util.hex_to_string(nep5Method)
+    if String.contains?(vmstate, "FAULT") do
+      []
+    else
+      notifications = result["notifications"]
 
-      loadRst = if nep5MethodStr == "transfer" do
-        from = Enum.at(state_value, 1)
-        to = Enum.at(state_value, 2)
-        value = Enum.at(state_value, 3)
+      dataRst =
+        Enum.map(Stream.with_index(notifications, 0), fn {notification, index} ->
+          contract = notification["contract"]
+          state_value = notification["state"]["value"]
 
-        fromDecoded = NeoWalletWeb.Util.hex_to_addr(from)
-        toDecoded = NeoWalletWeb.Util.hex_to_addr(to)
-        valueDecoded = NeoWalletWeb.Util.hex_to_integer(value)
+          # nep5 method should be "transfer"
+          nep5Method = Enum.at(state_value, 0)
+          nep5MethodStr = NeoWalletWeb.Util.hex_to_string(nep5Method)
 
-        {:ok, %{
-            txid: txid,
-            n: index,
-            vmstate: result["vmstate"],
-            contract: contract,
-            gas_consumed: result["gas_consumed"],
-            from: fromDecoded,
-            to: toDecoded,
-            value: valueDecoded
-        }}
-      else
-        {:fail, :not_transfer_data}
-      end
+          loadRst =
+            if nep5MethodStr == "transfer" do
+              from = Enum.at(state_value, 1)
+              to = Enum.at(state_value, 2)
+              value = Enum.at(state_value, 3)
 
-      loadRst
-    end)
+              fromDecoded = NeoWalletWeb.Util.hex_to_addr(from)
+              toDecoded = NeoWalletWeb.Util.hex_to_addr(to)
+              valueDecoded = NeoWalletWeb.Util.hex_to_integer(value)
 
-    filterRst = Enum.filter(dataRst, fn item ->
-      case item do
-        {:ok, _} -> true
-        {:fail, _} -> false
-      end
+              {:ok,
+               %{
+                 txid: txid,
+                 n: index,
+                 vmstate: result["vmstate"],
+                 contract: contract,
+                 gas_consumed: result["gas_consumed"],
+                 from: fromDecoded,
+                 to: toDecoded,
+                 value: valueDecoded
+               }}
+            else
+              {:fail, :not_transfer_data}
+            end
 
-    end)
+          loadRst
+        end)
 
-    refineFormat = Enum.map(filterRst, fn item ->
-      case item do
-        {:ok, load} -> load
-      end
-    end)
+      filterRst =
+        Enum.filter(dataRst, fn item ->
+          case item do
+            {:ok, _} -> true
+            {:fail, _} -> false
+          end
+        end)
 
-    refineFormat
+      refineFormat =
+        Enum.map(filterRst, fn item ->
+          case item do
+            {:ok, load} -> load
+          end
+        end)
+
+      refineFormat
+    end
   end
-
 end
