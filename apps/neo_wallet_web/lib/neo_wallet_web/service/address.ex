@@ -133,7 +133,9 @@ defmodule NeoWalletWeb.Service.Address do
         end
       end)
 
-      :ets.insert(:neo_token, {lineNamedMap[:hex_hash], lineNamedMap})
+      # temp support imageurl
+      appendImgURL = Map.put(lineNamedMap, :image_url, "https://seeklogo.com/images/N/neo-logo-6D07F7C1E7-seeklogo.com.gif")
+      :ets.insert(:neo_token, {lineNamedMap[:hex_hash], appendImgURL})
     end)
   end
 
