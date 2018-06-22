@@ -218,7 +218,7 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
         create_timestamp: time,
         from: it_item[:from],
         to: it_item[:to],
-        value: it_item[:value],
+        value: Integer.to_string(it_item[:value]),
         gas_consumed: it_item[:gas_consumed],
         vmstate: it_item[:vmstate],
         block: blockCount
