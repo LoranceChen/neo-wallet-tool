@@ -265,7 +265,7 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
   end
 
   def get_invocation_tansaction_from_http(txid) do
-    IO.puts "get_invocation_tansaction_from_http - #{inspect(txid)}"
+    # IO.puts "get_invocation_tansaction_from_http - #{inspect(txid)}"
 
     neoResponse = HTTPoison.post!(@neo_server, ~s({
       "jsonrpc": "2.0",
