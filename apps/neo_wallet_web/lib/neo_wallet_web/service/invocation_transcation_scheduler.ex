@@ -298,11 +298,20 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
             if nep5MethodStr == "transfer" do
               from = Enum.at(state_value, 1)["value"]
               to = Enum.at(state_value, 2)["value"]
-              value = Enum.at(state_value, 3)["value"]
+              valueType = Enum.at(state_value, 3)["type"]
+              valueValue = Enum.at(state_value, 3)["value"]
 
               fromDecoded = NeoWalletWeb.Util.hex_to_addr(from)
               toDecoded = NeoWalletWeb.Util.hex_to_addr(to)
-              valueDecoded = NeoWalletWeb.Util.hex_to_integer(value)
+
+              valueDecoded = case valueType do
+                "Integer" ->
+                  String.to_integer(valueValue)
+                "ByteArray" ->
+                  NeoWalletWeb.Util.hex_to_integer(valueValue)
+                _other ->
+                  raise "unsupport type - #{valueType}, in txid - #{inspect(txid)}"
+              end
 
               {:ok,
                %{
