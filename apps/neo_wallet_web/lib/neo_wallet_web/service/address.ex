@@ -51,8 +51,6 @@ defmodule NeoWalletWeb.Service.Address do
   end
 
   def init_token() do
-    :ets.delete_all_objects(:neo_token)
-
     # "HexHash,Type,Name,Symbol,Precision,Hash"
     lst = NeoWalletWeb.Util.read_file_lines("neo_token.csv")
     IO.puts("neo_tracker.csv template - #{List.first(lst)}")
