@@ -92,6 +92,18 @@ defmodule NeoWalletWeb.Router do
       else
         "-" <> rawValue
       end
+
+      txid = data[:txid]
+      symbol = case data[:type] do
+        "NEO" ->
+          "NEO"
+        "NEP5" ->
+          [{_, %{symbol: theSymbol}}] = :ets.lookup(:neo_token, txid)
+          theSymbol
+        other ->
+          "unsupported-#{other}"
+      end
+
       %{
         txid: data[:txid],
         type: data[:type],
@@ -102,7 +114,7 @@ defmodule NeoWalletWeb.Router do
         value: valueStr,
         gas_consumed: data[:gas_consumed],
         vmstate: data[:vmstate],
-        symbol: "todo_symbol",
+        symbol: symbol,
         imageURL: "todo_imageURL",
         decimal: NeoWalletWeb.Service.NeoCliHttp.get_decimal(data[:asset_id]),
       }

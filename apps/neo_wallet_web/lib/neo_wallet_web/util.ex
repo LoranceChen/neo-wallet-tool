@@ -130,5 +130,10 @@ defmodule NeoWalletWeb.Util do
 
   end
 
-
+  def read_file_lines(path) do
+    File.stream!(path)
+    |> Stream.map(&String.trim/1)
+    |> Stream.map(fn line -> line end)
+    |> Enum.to_list
+  end
 end
