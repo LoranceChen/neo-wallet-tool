@@ -8,7 +8,11 @@ defmodule NeoWalletWeb.Util do
   end
 
   def hex_to_addr(hexStr) do
-    hexStr2Bytes(hexStr) |> bytes2NeoAddress
+    if String.length(hexStr) == 0 do
+      ""
+    else
+      hexStr2Bytes(hexStr) |> bytes2NeoAddress
+    end
   end
 
   def hex_to_string(hexStr) do

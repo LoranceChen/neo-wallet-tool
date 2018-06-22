@@ -35,6 +35,10 @@ defmodule NeoWalletWeb.Service.Address do
   end
 
   def get_transaction_history(address, beginTime, endTime) do
+    if String.length(address) == 0 do
+      raise "address can't be empty"
+    end
+
     dbLst = from(th in NeoWalletWeb.Dao.TranscationHistory,
       where: th.create_timestamp >= ^beginTime and th.create_timestamp <= ^endTime and (th.from == ^address or th.to == ^address),
       order_by: [asc: th.create_timestamp],
