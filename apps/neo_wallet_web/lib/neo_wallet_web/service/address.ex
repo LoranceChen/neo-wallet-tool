@@ -102,7 +102,7 @@ defmodule NeoWalletWeb.Service.Address do
   #   ]
   # }
   def get_assets() do
-    :ets.foldl(fn ({key, value}, acc) ->
+    :ets.foldl(fn ({_key, value}, acc) ->
       acc ++ [value]
     end, [], :neo_token)
   end
