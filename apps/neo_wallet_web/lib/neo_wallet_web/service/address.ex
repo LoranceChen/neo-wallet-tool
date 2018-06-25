@@ -67,8 +67,13 @@ defmodule NeoWalletWeb.Service.Address do
         "NEO" ->
           "NEO"
         "NEP5" ->
-          [{_, %{symbol: theSymbol}}] = :ets.lookup(:neo_token, txid)
-          theSymbol
+          case :ets.lookup(:neo_token, txid) do
+            [] ->
+              "unsupported-symbol"
+            [{_, %{symbol: theSymbol}}] ->
+               theSymbol
+          end
+
         other ->
           "unsupported-#{other}"
       end
