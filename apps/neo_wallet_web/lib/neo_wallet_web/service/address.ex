@@ -62,14 +62,13 @@ defmodule NeoWalletWeb.Service.Address do
         "+" <> rawValue
       end
 
-      txid = data[:txid]
+      asset_id = data[:asset_id]
       symbol = case data[:type] do
         "NEO" ->
           "NEO"
         "NEP5" ->
-          case :ets.lookup(:neo_token, txid) do
+          case :ets.lookup(:neo_token, asset_id) do
             [] ->
-              IO.puts("unsupported-symbol - #{inspect(txid)}")
               "unsupported-symbol"
             [{_, %{symbol: theSymbol}}] ->
                theSymbol
