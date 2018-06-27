@@ -37,8 +37,8 @@ defmodule NeoWalletWeb.Service.NeoCliHttp do
         result = bodyMap["result"]
 
         dicemalRst = case result["stack"] do
-          nil -> nil
-          [] -> nil
+          nil -> :ets.insert(:nep5_hash, {nep5_hash, nil})
+          [] -> :ets.insert(:nep5_hash, {nep5_hash, nil})
           other ->
             dicemal = List.first(other)["value"]
             :ets.insert(:nep5_hash, {nep5_hash, dicemal})
