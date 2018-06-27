@@ -57,9 +57,9 @@ defmodule NeoWalletWeb.Service.Address do
       rawValue = data[:value]
       fromAddr = data[:from]
       valueStr = if fromAddr == address do
-        "+" <> rawValue
-      else
         "-" <> rawValue
+      else
+        "+" <> rawValue
       end
 
       txid = data[:txid]
@@ -69,6 +69,7 @@ defmodule NeoWalletWeb.Service.Address do
         "NEP5" ->
           case :ets.lookup(:neo_token, txid) do
             [] ->
+              IO.puts("unsupported-symbol - #{inspect(txid)}")
               "unsupported-symbol"
             [{_, %{symbol: theSymbol}}] ->
                theSymbol
