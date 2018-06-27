@@ -19,13 +19,14 @@ defmodule NeoWalletWeb.Service.NeoCliHttp do
   end
 
   def get_decimal(nep5_hash) do
+
     case :ets.lookup(:nep5_hash, nep5_hash) do
       [] ->
         neoResponse = HTTPoison.post!(@neo_server, ~s({
           "jsonrpc": "2.0",
           "method": "invokefunction",
           "params": [
-            "0x#{nep5_hash}",
+            "#{nep5_hash}",
             "decimals",
             []
             ],
