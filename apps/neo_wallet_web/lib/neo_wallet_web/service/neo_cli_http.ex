@@ -35,7 +35,7 @@ defmodule NeoWalletWeb.Service.NeoCliHttp do
         bodyStr = neoResponse.body
         bodyMap = Poison.decode!(bodyStr)
         result = bodyMap["result"]
-        dicemal = result["stack"][0]["value"]
+        dicemal = List.first(result["stack"])["value"]
         :ets.insert(:nep5_hash, {nep5_hash, dicemal})
         dicemal
       [{_, dicemal}] ->
