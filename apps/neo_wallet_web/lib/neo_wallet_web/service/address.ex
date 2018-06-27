@@ -118,8 +118,9 @@ defmodule NeoWalletWeb.Service.Address do
 
   defp init_token() do
     # "HexHash,Type,Name,Symbol,Precision,Hash"
-    lst = NeoWalletWeb.Util.read_file_lines("neo_token.csv")
-    IO.puts("neo_tracker.csv template - #{List.first(lst)}")
+    filePath = Path.join(:code.priv_dir(:neo_wallet_web), "resource/neo_token.csv")
+    lst = NeoWalletWeb.Util.read_file_lines(filePath)
+    IO.puts("neo_token.csv column template - #{List.first(lst)}")
 
     Enum.each(List.delete_at(lst, 0), fn line ->
       items = String.split(line, ",")
