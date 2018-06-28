@@ -4,7 +4,7 @@ defmodule NeoWalletWeb.Application do
   @moduledoc false
 
   use Application
-
+  require Logger
   def start(_type, _args) do
     port = Application.get_env(:neo_wallet_web, :cowboy_port, 8080)
 
@@ -17,12 +17,12 @@ defmodule NeoWalletWeb.Application do
       NeoWalletWeb.Service.InvocationTranscationScheduler,
       NeoWalletWeb.Service.NeoCliHttp,
       NeoWalletWeb.Service.Address,
-      
+
       Plug.Adapters.Cowboy2.child_spec(scheme: :http, plug: NeoWalletWeb.Router, options: [port: port]),
 
     ]
 
-    IO.puts "server listening at: #{port}"
+    Logger.info "server listening at: #{port}"
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

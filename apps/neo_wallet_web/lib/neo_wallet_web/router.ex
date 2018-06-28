@@ -62,6 +62,13 @@ defmodule NeoWalletWeb.Router do
     send_resp(conn, 200, Poison.encode!(result))
   end
 
+  get "/nep5-value/:address" do
+    assets = fetch_query_params(conn).params["assets"]
+
+    
+
+  end
+
   match(_, do: send_resp(conn, 404, "Oops!\n"))
 
   defp get_utxos_response(address) do

@@ -21,7 +21,8 @@ defmodule NeoWalletWeb.MixProject do
       applications: [:httpoison,
 		     :cowboy,
 		     :plug,
-		     :ecto
+         :ecto,
+         :logger,
 		    ],
       extra_applications: [:logger],
       mod: {NeoWalletWeb.Application, []},
@@ -40,6 +41,7 @@ defmodule NeoWalletWeb.MixProject do
       {:httpoison, "~> 1.1"},
       {:cowboy, "~> 2.4.0", override: true},
       {:distillery, "~> 1.5", runtime: false},
+      {:logger_file_backend, "~> 0.0.10"},
 
 	# {:dep_from_hexpm, "~> 0.3.0"},
 	# {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
