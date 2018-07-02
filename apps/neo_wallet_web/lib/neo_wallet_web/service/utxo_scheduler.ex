@@ -162,6 +162,8 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
 
         case NeoWalletWeb.Repo.get_by(
                NeoWalletWeb.Dao.UTXO,
+               # check: 如果自己转给自己，那么第二次转的记录就不会存入表中
+               # bugfix: 唯一的交易记录是txid和n标记一个唯一地址。而且上面处理vout的逻辑也没有报错——update_all可能匹配0个
                [txid: txid, address: address, asset: asset],
                log: false
              ) do
