@@ -131,8 +131,7 @@ defmodule NeoWalletWeb.Service.UtxoScheduler do
         # ,
         q = from(
           u in NeoWalletWeb.Dao.UTXO,
-          where: u.txid == ^txid and u.n == ^vout,
-          limit: 1
+          where: u.txid == ^txid and u.n == ^vout
         )
         # flag is used
         NeoWalletWeb.Repo.update_all(q, [set: [is_spent: true]], log: false)

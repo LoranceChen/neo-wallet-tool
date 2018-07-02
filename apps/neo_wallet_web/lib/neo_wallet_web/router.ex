@@ -65,7 +65,7 @@ defmodule NeoWalletWeb.Router do
   get "/nep5-value/:address" do
     assets = fetch_query_params(conn).params["assets"]
 
-    
+
 
   end
 
