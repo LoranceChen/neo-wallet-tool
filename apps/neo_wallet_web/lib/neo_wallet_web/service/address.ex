@@ -56,9 +56,13 @@ defmodule NeoWalletWeb.Service.Address do
     formatted = Enum.map(dataLst, fn(data) ->
       rawValue = data[:value]
       fromAddr = data[:from]
-      valueStr = if fromAddr == address do
+      toAddr = data[:toAddr]
+      valueStr = cond do
+        toAddr == fromAddr -> # 自己转给自己
+          "+" <> rawValue
+        fromAddr == address -> # 花出去了
         "-" <> rawValue
-      else
+        toAddr == address -> # 转给了自己
         "+" <> rawValue
       end
 
