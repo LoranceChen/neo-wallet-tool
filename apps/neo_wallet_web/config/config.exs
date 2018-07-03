@@ -31,7 +31,7 @@ use Mix.Config
 
 config :neo_wallet_web, NeoWalletWeb.Repo,
   adapter: Ecto.Adapters.MySQL,
-  database: "neo_wallet_tool",
+  database: "neo_wallet_tool_v2",
   username: "root",
 #  password: "pass",
   hostname: "localhost"
