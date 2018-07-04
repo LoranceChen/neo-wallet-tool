@@ -44,10 +44,10 @@ config :neo_wallet_web, neo_server: "https://tracker.chinapex.com.cn/neo-cli/"
 
 config :neo_wallet_web, neo_address_version: 23
 
-config :logger,
-  backends: [:console, {LoggerFileBackend, :error_log}],
-  format: "[$level] $message\n"
+# config :logger,
+#   backends: [:console, {LoggerFileBackend, :error_log}],
+#   format: "[$level] $message\n"
 
-config :logger, :error_log,
-  path: "./info.log",
-  level: :info
+# config :logger, :error_log,
+#   path: "./info.log",
+#   level: :info
