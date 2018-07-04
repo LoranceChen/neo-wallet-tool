@@ -58,10 +58,26 @@ defmodule NeoWalletWeb.Service.Address do
       fromAddr = data[:from]
       toAddr = data[:to]
       decimal = NeoWalletWeb.Service.NeoCliHttp.get_decimal(data[:asset_id])
+      asset_id = data[:asset_id]
 
-      {floatValue, _} = Float.parse(rawValue)
-      floatDivDicimal = floatValue / :math.pow(10, String.to_integer(decimal))
-      formatStrValue = :erlang.float_to_binary(floatDivDicimal)
+      {symbol, formatStrValue} = case data[:type] do
+        "NEO" ->
+          {"NEO", rawValue}
+        "NEP5" ->
+          case :ets.lookup(:neo_token, asset_id) do
+            [] ->
+              {"unsupported-symbol", rawValue}
+            [{_, %{symbol: theSymbol}}] ->
+              {floatValue, _} = Float.parse(rawValue)
+              floatDivDicimal = floatValue / :math.pow(10, String.to_integer(decimal))
+              formatStrValue = :erlang.float_to_binary(floatDivDicimal, dicimals: String.to_integer(decimal))
+
+              {theSymbol, formatStrValue}
+          end
+
+        other ->
+          {"unsupported-#{other}", rawValue}
+      end
 
       valueStr = cond do
         toAddr == fromAddr -> # 自己转给自己
@@ -70,22 +86,6 @@ defmodule NeoWalletWeb.Service.Address do
           "-" <> formatStrValue
         toAddr == address -> # 转给了自己
           "+" <> formatStrValue
-      end
-
-      asset_id = data[:asset_id]
-      symbol = case data[:type] do
-        "NEO" ->
-          "NEO"
-        "NEP5" ->
-          case :ets.lookup(:neo_token, asset_id) do
-            [] ->
-              "unsupported-symbol"
-            [{_, %{symbol: theSymbol}}] ->
-               theSymbol
-          end
-
-        other ->
-          "unsupported-#{other}"
       end
 
       %{
@@ -97,10 +97,11 @@ defmodule NeoWalletWeb.Service.Address do
         to: data[:to],
         value: valueStr,
         gas_consumed: data[:gas_consumed],
+        rawValue: rawValue,
         vmstate: data[:vmstate],
         symbol: symbol,
         imageURL: "todo_imageURL",
-        decimal: NeoWalletWeb.Service.NeoCliHttp.get_decimal(data[:asset_id]),
+        decimal: decimal,
       }
     end)
 
@@ -158,5 +159,22 @@ defmodule NeoWalletWeb.Service.Address do
       :ets.insert(:neo_token, {lineNamedMap[:hex_hash], appendImgURL})
     end)
   end
+
+
+  def cutTail(numberCharList) do
+    lastChar = List.last(numberCharList)
+    cond do
+      lastChar == ?0 ->
+        heads = List.delete_at(numberCharList, Enum.count(numberCharList) - 1)
+        cutTail(heads)
+      lastChar == ?. ->
+        heads = List.delete_at(numberCharList, Enum.count(numberCharList) - 1)
+        heads
+      true -> #ok
+        numberCharList
+    end
+
+  end
+
 
 end
