@@ -57,16 +57,16 @@ defmodule NeoWalletWeb.Router do
   end
 
   get "/assets" do
-    assets = NeoWalletWeb.Service.Address.get_assets()
+    assets = NeoWalletWeb.Service.Token.get_assets()
     result = %{state: 200, result: assets}
     send_resp(conn, 200, Poison.encode!(result))
   end
 
-  get "/nep5-value/:address" do
-    assets = fetch_query_params(conn).params["assets"]
-
-
-
+  post "/nep5-value/:address" do
+    IO.inspect(conn)
+    IO.inspect conn.body_params # Prints JSON POST body
+    result = NeoWalletWeb.Service.Address.get_assets_value("address", ["0xaaaa"])
+    send_resp(conn, 200, "assets - #{inspect(result)}")
   end
 
   match(_, do: send_resp(conn, 404, "Oops!\n"))
