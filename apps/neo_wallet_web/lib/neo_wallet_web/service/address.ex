@@ -59,9 +59,9 @@ defmodule NeoWalletWeb.Service.Address do
       toAddr = data[:to]
       decimal = NeoWalletWeb.Service.NeoCliHttp.get_decimal(data[:asset_id])
 
-      floatValue = String.to_float(rawValue)
-      flaotDivDicimal = floatValue / :math.pow(10, String.to_float(decimal))
-      formatStrValue = :erlang.float_to_binary(flaotDivDicimal, decimals: 8)
+      integerValue = String.to_integer(rawValue)
+      floatDivDicimal = integerValue / :math.pow(10, String.to_integer(decimal))
+      formatStrValue = :erlang.float_to_binary(floatDivDicimal)
 
       valueStr = cond do
         toAddr == fromAddr -> # 自己转给自己
