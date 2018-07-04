@@ -72,7 +72,8 @@ defmodule NeoWalletWeb.Service.Address do
               floatDivDicimal = floatValue / :math.pow(10, String.to_integer(decimal))
               formatStrValue = :erlang.float_to_binary(floatDivDicimal, dicimals: String.to_integer(decimal))
 
-              {theSymbol, formatStrValue}
+              readableValue = cutTail(String.to_charlist(formatStrValue)) |> List.to_string
+              {theSymbol, readableValue}
           end
 
         other ->
@@ -161,7 +162,7 @@ defmodule NeoWalletWeb.Service.Address do
   end
 
 
-  def cutTail(numberCharList) do
+  defp cutTail(numberCharList) do
     lastChar = List.last(numberCharList)
     cond do
       lastChar == ?0 ->
