@@ -19,6 +19,9 @@ defmodule NeoWalletWeb.Util do
     hexStr2Bytes(hexStr)
   end
 
+  def addr_to_hex(address) do
+    
+  end
 
   defp hexStr2Bytes(hexString, bytes \\ <<>>) do
     length = String.length(hexString)

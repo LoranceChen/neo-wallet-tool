@@ -1,6 +1,8 @@
 defmodule NeoWalletWeb.Service.Token do
   use GenServer
 
+  @neo_server Application.get_env(:neo_wallet_web, :neo_server, "https://tracker.chinapex.com.cn/neo-cli/")
+
   def start_link(_opt) do
     GenServer.start_link(__MODULE__, :ok)
   end
@@ -36,6 +38,44 @@ defmodule NeoWalletWeb.Service.Token do
       acc ++ [value]
     end, [], :neo_token)
   end
+
+
+  # {
+  #   "jsonrpc": "2.0",
+  #   "method": "invokefunction",
+  #   "params": [
+  #     "0x45d493a6f73fa5f404244a5fb8472fc014ca5885",
+  #     "decimals",
+  #     []
+  #     ],
+  #   "id": 2
+  # }
+  def get_values(address, nep5List) do
+
+    httpResponse = HTTPoison.post!(@neo_server, ~s(
+	    {
+        "jsonrpc": "2.0",
+        "method": "invokefunction",
+        "params": [
+          "0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9", # hash of CPX
+          "balanceOf",
+          [
+            {
+              "type": "Hash160",
+              "value": "0xa7274594ce215208c8e309e8f2fe05d4a9ae412b"
+            }
+          ]
+        ],
+        "id": 3
+      }
+    ), [{"Content-Type", "application/json"}], recv_timeout: 30_000)
+
+
+  end
+
+  # defp  do
+
+  # end
 
   defp init_token() do
     # "HexHash,Type,Name,Symbol,Precision,Hash"

@@ -52,7 +52,7 @@ defmodule NeoWalletWeb.Service.Address do
             [{_, %{symbol: theSymbol}}] ->
               {floatValue, _} = Float.parse(rawValue)
               floatDivDicimal = floatValue / :math.pow(10, String.to_integer(decimal))
-              formatStrValue = :erlang.float_to_binary(floatDivDicimal, dicimals: String.to_integer(decimal))
+              formatStrValue = :erlang.float_to_binary(floatDivDicimal, decimals: String.to_integer(decimal))
 
               readableValue = cutTail(String.to_charlist(formatStrValue)) |> List.to_string
               {theSymbol, readableValue}
