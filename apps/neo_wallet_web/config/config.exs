@@ -31,12 +31,12 @@ use Mix.Config
 
 config :neo_wallet_web, NeoWalletWeb.Repo,
   adapter: Ecto.Adapters.MySQL,
-  database: "neo_wallet_tool",
+  database: "neo_wallet_tool_v2",
   username: "root",
 #  password: "pass",
   hostname: "localhost"
 
-config :neo_wallet_web, cowboy_port: 8083
+config :neo_wallet_web, cowboy_port: 8084
 
 config :neo_wallet_web, ecto_repos: [NeoWalletWeb.Repo]
 
