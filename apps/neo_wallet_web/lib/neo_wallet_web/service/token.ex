@@ -17,7 +17,16 @@ defmodule NeoWalletWeb.Service.Token do
     ])
     init_token()
 
-    {:ok, ref}
+    ref1 = :ets.new(:neo_token_seq, [
+      :named_table,
+      :set,
+      :public,
+      read_concurrency: true,
+      write_concurrency: true
+    ])
+    init_token_seq()
+
+    {:ok, {ref, ref1}}
   end
 
   # {
@@ -34,11 +43,32 @@ defmodule NeoWalletWeb.Service.Token do
   #   ]
   # }
   def get_assets() do
-    :ets.foldl(fn ({_key, value}, acc) ->
+    allAssets = :ets.foldl(fn ({_key, value}, acc) ->
       acc ++ [value]
     end, [], :neo_token)
-  end
 
+    # 越小值越大
+    Enum.sort(allAssets, fn (asset, asset2) ->
+      assetSymbol = asset[:symbol]
+      assetSymbol2 = asset2[:symbol]
+      priority = case :ets.lookup(:neo_token_seq, assetSymbol) do
+        [{_, priority}] ->
+          priority
+        _other ->
+          100000
+      end
+      priority2 = case :ets.lookup(:neo_token_seq, assetSymbol2) do
+        [{_, priority2}] ->
+          priority2
+        _other ->
+          100000
+      end
+      IO.puts("allAssets_assetSymbol - #{inspect(asset)}, #{inspect(asset2)}")
+      IO.puts("priproty - #{inspect(priority)} #{inspect(priority2)}")
+      priority <= priority2
+    end)
+
+  end
 
   # {
   #   "jsonrpc": "2.0",
@@ -70,12 +100,7 @@ defmodule NeoWalletWeb.Service.Token do
       }
     ), [{"Content-Type", "application/json"}], recv_timeout: 30_000)
 
-
   end
-
-  # defp  do
-
-  # end
 
   defp init_token() do
     # "HexHash,Type,Name,Symbol,Precision,Hash"
@@ -108,6 +133,19 @@ defmodule NeoWalletWeb.Service.Token do
       appendImgURL = Map.put(lineNamedMap, :image_url, "https://i0.wp.com/www.blockchaindk.com/wp-content/uploads/2017/11/NEON-Wallet-Logo.png")
       :ets.insert(:neo_token, {lineNamedMap[:hex_hash], appendImgURL})
     end)
+  end
+
+  defp init_token_seq() do
+    filePath = Path.join(:code.priv_dir(:neo_wallet_web), "resource/token_seq.csv")
+    lst = NeoWalletWeb.Util.read_file_lines(filePath)
+
+    Enum.each(Enum.with_index(lst), fn {line, index} ->
+      items = String.split(line, ",")
+      tokenSymbol = List.first(items)
+      IO.puts("tokenSymbol - " <> tokenSymbol <>  " " <> Integer.to_string(index))
+      :ets.insert(:neo_token_seq, {tokenSymbol, index})
+    end)
+
   end
 
 end
