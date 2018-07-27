@@ -63,8 +63,8 @@ defmodule NeoWalletWeb.Service.Token do
         _other ->
           100000
       end
-      IO.puts("allAssets_assetSymbol - #{inspect(asset)}, #{inspect(asset2)}")
-      IO.puts("priproty - #{inspect(priority)} #{inspect(priority2)}")
+     # IO.puts("allAssets_assetSymbol - #{inspect(asset)}, #{inspect(asset2)}")
+     # IO.puts("priproty - #{inspect(priority)} #{inspect(priority2)}")
       priority <= priority2
     end)
 
@@ -106,7 +106,7 @@ defmodule NeoWalletWeb.Service.Token do
     # "HexHash,Type,Name,Symbol,Precision,Hash"
     filePath = Path.join(:code.priv_dir(:neo_wallet_web), "resource/neo_token.csv")
     lst = NeoWalletWeb.Util.read_file_lines(filePath)
-    IO.puts("neo_token.csv column template - #{List.first(lst)}")
+    # IO.puts("neo_token.csv column template - #{List.first(lst)}")
 
     Enum.each(List.delete_at(lst, 0), fn line ->
       items = String.split(line, ",")
@@ -142,7 +142,7 @@ defmodule NeoWalletWeb.Service.Token do
     Enum.each(Enum.with_index(lst), fn {line, index} ->
       items = String.split(line, ",")
       tokenSymbol = List.first(items)
-      IO.puts("tokenSymbol - " <> tokenSymbol <>  " " <> Integer.to_string(index))
+     # IO.puts("tokenSymbol - " <> tokenSymbol <>  " " <> Integer.to_string(index))
       :ets.insert(:neo_token_seq, {tokenSymbol, index})
     end)
 
