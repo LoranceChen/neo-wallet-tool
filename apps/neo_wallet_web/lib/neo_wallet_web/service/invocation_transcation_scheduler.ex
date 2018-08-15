@@ -267,17 +267,18 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
   def get_invocation_tansaction_from_http(txid) do
     # IO.puts "get_invocation_tansaction_from_http - #{inspect(txid)}"
 
-    neoResponse = HTTPoison.post!(@neo_server, ~s({
-      "jsonrpc": "2.0",
-      "method": "getapplicationlog",
-      "params": ["#{txid}"],
-      "id": 1
-        }), [{"Content-Type", "application/json"}])
+    # neoResponse = HTTPoison.post!(@neo_server, ~s({
+    #   "jsonrpc": "2.0",
+    #   "method": "getapplicationlog",
+    #   "params": ["#{txid}"],
+    #   "id": 1
+    #     }), [{"Content-Type", "application/json"}])
 
-    bodyStr = neoResponse.body
-    bodyMap = Poison.decode!(bodyStr)
+    # bodyStr = neoResponse.body
+    #bodyMap = Poison.decode!(bodyStr)
 
-    result = bodyMap["result"]
+    # result = bodyMap["result"]
+    result = getapplicationlog(txid)
     vmstate = result["vmstate"]
 
     if String.contains?(vmstate, "FAULT") do
@@ -348,5 +349,17 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
 
       refineFormat
     end
+  end
+
+  def getapplicationlog(txid) do
+    q =
+      from(
+        a in NeoWalletWeb.Dao.ApplicationLog,
+        where: a.txid == ^txid,
+        select: a.data
+      )
+
+    data = NeoWalletWeb.Repo.one(q, log: false)
+    Poison.decode!(data)
   end
 end
