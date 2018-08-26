@@ -359,7 +359,7 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
         select: a.data
       )
 
-    data = NeoWalletWeb.Repo.one(q, log: false)
+    data = NeoWalletWeb.RepoLog.one(q, log: false)
     Poison.decode!(data)
   end
 end
