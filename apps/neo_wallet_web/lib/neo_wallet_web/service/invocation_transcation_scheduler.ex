@@ -288,48 +288,54 @@ defmodule NeoWalletWeb.Service.InvocationTranscationScheduler do
 
       dataRst =
         Enum.map(Stream.with_index(notifications, 0), fn {notification, index} ->
-          contract = notification["contract"]
-          state_value = notification["state"]["value"]
+          try do
+            contract = notification["contract"]
+            state_value = notification["state"]["value"]
 
-          # nep5 method should be "transfer"
-          nep5Method = Enum.at(state_value, 0)
-          nep5MethodStr = NeoWalletWeb.Util.hex_to_string(nep5Method["value"])
+            # nep5 method should be "transfer"
+            nep5Method = Enum.at(state_value, 0)
+            nep5MethodStr = NeoWalletWeb.Util.hex_to_string(nep5Method["value"])
 
-          loadRst =
-            if nep5MethodStr == "transfer" do
-              from = Enum.at(state_value, 1)["value"]
-              to = Enum.at(state_value, 2)["value"]
-              valueType = Enum.at(state_value, 3)["type"]
-              valueValue = Enum.at(state_value, 3)["value"]
+            loadRst =
+              if nep5MethodStr == "transfer" do
+                from = Enum.at(state_value, 1)["value"]
+                to = Enum.at(state_value, 2)["value"]
+                valueType = Enum.at(state_value, 3)["type"]
+                valueValue = Enum.at(state_value, 3)["value"]
 
-              fromDecoded = NeoWalletWeb.Util.hex_to_addr(from)
-              toDecoded = NeoWalletWeb.Util.hex_to_addr(to)
+                fromDecoded = NeoWalletWeb.Util.hex_to_addr(from)
+                toDecoded = NeoWalletWeb.Util.hex_to_addr(to)
 
-              valueDecoded = case valueType do
-                "Integer" ->
-                  String.to_integer(valueValue)
-                "ByteArray" ->
-                  NeoWalletWeb.Util.hex_to_integer(valueValue)
-                _other ->
-                  raise "unsupport type - #{valueType}, in txid - #{inspect(txid)}"
+                valueDecoded = case valueType do
+                  "Integer" ->
+                    String.to_integer(valueValue)
+                  "ByteArray" ->
+                    NeoWalletWeb.Util.hex_to_integer(valueValue)
+                  _other ->
+                    raise "unsupport type - #{valueType}, in txid - #{inspect(txid)}"
+                end
+
+                {:ok,
+                %{
+                  txid: txid,
+                  n: index,
+                  vmstate: result["vmstate"],
+                  contract: contract,
+                  gas_consumed: result["gas_consumed"],
+                  from: fromDecoded,
+                  to: toDecoded,
+                  value: valueDecoded
+                }}
+              else
+                {:fail, :not_transfer_data}
               end
 
-              {:ok,
-               %{
-                 txid: txid,
-                 n: index,
-                 vmstate: result["vmstate"],
-                 contract: contract,
-                 gas_consumed: result["gas_consumed"],
-                 from: fromDecoded,
-                 to: toDecoded,
-                 value: valueDecoded
-               }}
-            else
-              {:fail, :not_transfer_data}
-            end
+            loadRst
+          rescue
+            _ ->
+              {:fail, :some_exception}
+          end
 
-          loadRst
         end)
 
       filterRst =
